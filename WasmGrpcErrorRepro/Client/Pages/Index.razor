@@ -1,0 +1,45 @@
+﻿@page "/"
+@using WasmGrpcErrorRepro.Shared
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<div class="requests">
+  @foreach (var request in requests)
+  {
+    <div class="request">
+      <span>Count: </span>
+      <input type="number" @bind-value="request.Count" />
+      <button @onclick="() => requests.Remove(request)">Remove</button>
+    </div>
+  }
+
+  <button @onclick="() => requests.Add(new())">Add Request</button>
+  <button @onclick="GetDataAsync">Request Data</button>
+</div>
+
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+  [Inject] private IDataService DataService { get; set; }
+
+  private readonly List<DataRequest> requests = new()
+  {
+    new() { Count = 250000 },
+  };
+
+  private Task GetDataAsync()
+  {
+    var dataTasks = new List<Task<IEnumerable<int>>>();
+    foreach (var request in requests)
+    {
+      dataTasks.Add(DataService.GetDataAsync(request));
+    }
+
+    return Task.WhenAll(dataTasks);
+  }
+}
