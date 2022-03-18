@@ -21,7 +21,7 @@ builder.Services.AddSingleton(sp =>
     new GrpcChannelOptions() { HttpClient = new HttpClient(handler) });
 });
 
-builder.Services.AddTransient(sp =>
+builder.Services.AddScoped(sp =>
 {
   var channel = sp.GetRequiredService<GrpcChannel>();
   return channel.CreateGrpcService<IDataService>();
