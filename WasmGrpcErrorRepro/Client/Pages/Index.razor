@@ -8,38 +8,39 @@
 Welcome to your new app.
 
 <div class="requests">
-  @foreach (var request in requests)
-  {
-    <div class="request">
-      <span>Count: </span>
-      <input type="number" @bind-value="request.Count" />
-      <button @onclick="() => requests.Remove(request)">Remove</button>
-    </div>
-  }
+    @foreach (var request in requests)
+    {
+        <div class="request">
+            <span>Count: </span>
+            <input type="number" @bind-value="request.Count" />
+            <button @onclick="() => requests.Remove(request)">Remove</button>
+        </div>
+    }
 
-  <button @onclick="() => requests.Add(new())">Add Request</button>
-  <button @onclick="GetDataAsync">Request Data</button>
+    <button @onclick="() => requests.Add(new())">Add Request</button>
+    <button @onclick="GetDataAsync">Request Data</button>
 </div>
 
 
 <SurveyPrompt Title="How is Blazor working for you?" />
 
 @code {
-  [Inject] private IDataService DataService { get; set; }
+    [Inject] private IServiceProvider ServiceProvider { get; set; }
 
-  private readonly List<DataRequest> requests = new()
-  {
-    new() { Count = 250000 },
-  };
+    private readonly List<DataRequest> requests = new()
+        {
+            new() { Count = 250000 },
+        };
 
-  private Task GetDataAsync()
-  {
-    var dataTasks = new List<Task<IEnumerable<int>>>();
-    foreach (var request in requests)
+    private Task GetDataAsync()
     {
-      dataTasks.Add(DataService.GetDataAsync(request));
-    }
+        var dataTasks = new List<Task<IEnumerable<int>>>();
+        foreach (var request in requests)
+        {
+            var dataService = ServiceProvider.GetRequiredService<IDataService>();
+            dataTasks.Add(dataService.GetDataAsync(request));
+        }
 
-    return Task.WhenAll(dataTasks);
-  }
+        return Task.WhenAll(dataTasks);
+    }
 }
