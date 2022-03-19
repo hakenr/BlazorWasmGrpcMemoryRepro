@@ -25,7 +25,7 @@ Welcome to your new app.
 <SurveyPrompt Title="How is Blazor working for you?" />
 
 @code {
-  [Inject] private IDataService DataService { get; set; }
+  [Inject] private Func<IDataService> DataService { get; set; }
 
   private readonly List<DataRequest> requests = new()
   {
@@ -37,7 +37,7 @@ Welcome to your new app.
     var dataTasks = new List<Task<IEnumerable<int>>>();
     foreach (var request in requests)
     {
-      dataTasks.Add(DataService.GetDataAsync(request));
+      dataTasks.Add(DataService().GetDataAsync(request));
     }
 
     return Task.WhenAll(dataTasks);
